@@ -7,9 +7,22 @@ titles = []
 obs_values = []
 exp_values = []
 
-def parse(fileName):
+def parse():
 
-	f = open(str(fileName)+'.csv') #open file
+	rawData = []
+	titles = []
+
+	obs_values = []
+	exp_values = []
+	
+	while True:
+		fileName = raw_input("Enter csv file name: ")
+		try: 
+			f = open(str(fileName)+'.csv') #open file
+			break
+		except IOError:
+			print "No such file or directory. Please try again."
+
 	csv_f = csv.reader(f)
 	for row in csv_f:
 		rawData.append(row) #appends each row to rawData array
@@ -18,11 +31,27 @@ def parse(fileName):
 	print titles
 	print rawData
 
-	test = raw_input("Please select '1' for goodness or '2' for independence test: ")
+	return titles,rawData
+
+
+def main():
+
+	titles, rawData = parse()
+
+	while True: #input checking
+		test = raw_input("Please select '1' for goodness, '2' for independence test, or '3' to select a different file: ")
+		#print test
+		if test == "1" or test == "2" or test == "3":
+			break
 
 	if test=="1":
-		
-		obs_index = titles.index(raw_input("Please select observed category: ")) #finds index in array of column
+
+		while True:
+			try:
+				obs_index = titles.index(raw_input("Please select observed category: ")) #finds index in array of column
+				break
+			except ValueError:
+				print "Could not find category in list."
 		
 		exp_input = raw_input("Please select expected category. If none, leave blank: ")
 
@@ -45,19 +74,23 @@ def parse(fileName):
 			goodness(obs_values)
 
 	elif test=="2":
-		
+			
 		for i in rawData:
 			try: 
 				obs_values.append(map(float,i)) #converts strings to floats
 			except ValueError: 
 				obs_values.append(map(float,i[1:])) #discards first column
-		
+			
 		print obs_values
-		
+			
 		independence(obs_values)
 
-	else: 
-		print "exception handling"
+	elif test=='3': 
+		repeat()
+
+	if raw_input("Another test? y/n: ") =="y":
+		repeat()
+
 
 def goodness(f_obs, f_exp=None):
 	chi2, p = stats.chisquare(f_obs, f_exp=f_exp)
@@ -67,9 +100,7 @@ def independence(table):
 	chi2, p, df, f_exp = stats.chi2_contingency(table)
 	print "chi-square statistic: %.6f \np-value: %.6f \ndegrees of freedom: %d \nexpected values: %s" %(chi2, p, df, f_exp)
 
-def prompt():
-	fileName = raw_input("Enter csv file name: ")
-	print fileName
-	parse(fileName)
+def repeat():
+	main()
 
-prompt()
+main()
