@@ -27,8 +27,51 @@ opencsv <- function()
   rXsq
 }
 
+x2_gof <- function()
+{
 
-x2 <- function()
+  filename <- readline(prompt = "Enter .csv file name: ")
+  
+  #reads titles
+  coltitles <<- read.csv(file=paste0(filename,".csv"), nrows=1, head=FALSE) #paste0 removes space
+  print(coltitles)
+  
+  f_obs <- readline(prompt = "Select observed frequency column by name or number: ")
+  
+  #test if letter or number
+  if (is.numeric(suppressWarnings(as.integer(f_obs))) & !is.na(suppressWarnings(as.integer(f_obs)))){
+    f_obs <- as.integer(f_obs)
+  }
+  
+  f_exp <- readline(prompt = "Select expected frequency column by name or number. If evenly distributed, leave blank: ")
+  print(f_exp)
+  
+  rawData <<- read.csv(file=paste0(filename,".csv"), head=TRUE, sep=",")
+  
+  if (f_exp==""){
+  
+    #evenly distributed data
+    rXsq <- chisq.test(rawData[f_obs])
+    print(rXsq)
+    
+  } else {
+    
+    #test if letter or number
+    if (is.numeric(suppressWarnings(as.integer(f_exp))) & !is.na(suppressWarnings(as.integer(f_exp)))){
+      f_exp <- as.integer(f_exp)
+    }
+
+    sum_exp <- unlist(sum(rawData[f_exp]))
+    norm_exp <- unlist(rawData[f_exp]/sum_exp)
+    
+    rXsq <- chisq.test(rawData[f_obs], p=norm_exp)
+    print(rXsq)
+    
+  }
+
+}
+
+x2_ind <- function()
 {
   filename <- readline(prompt = "Enter .csv file name: ")
   
@@ -56,4 +99,3 @@ x2 <- function()
   
 }
 
-x2()
