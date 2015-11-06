@@ -36,6 +36,8 @@ def parse():
 	for i in range(len(titles)):
 		print str.center(str(i+1), 8), titles[i]
 
+	f.close()
+
 	return titles,rawData
 
 def x2_gof(test=False):
