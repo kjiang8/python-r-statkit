@@ -168,15 +168,15 @@ def getgofdata(obs_index, exp_index, rawData, test):
 
 def goodness(f_obs, f_exp=None):
 	chi2, p = stats.chisquare(f_obs, f_exp=f_exp)
-	print "chi-square statistic: %.6f \np-value: %.10f" %(chi2, p)
+	print "chi-square statistic: %s \np-value: %s" %(chi2, p)
 
 def independence(table, test):
 	chi2, p, df, f_exp = stats.chi2_contingency(table)
 
 	if test==True:
-		print "chi-square statistic: %.6f \np-value: %.10f \ndegrees of freedom: %d \nexpected values: %s" %(chi2, p, df, f_exp)
+		print "chi-square statistic: %s \np-value: %s \ndegrees of freedom: %d \nexpected values: %s" %(chi2, p, df, f_exp)
 	else: 
-		print "chi-square statistic: %.6f \np-value: %.10f" %(chi2, p)
+		print "chi-square statistic: %s \np-value: %s" %(chi2, p)
 
 def reset():
 	#resets all global var
