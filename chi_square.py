@@ -15,7 +15,7 @@ def parse(test):
 	'''
 	this function is a file input handler. it opens .csv files, reads the file column names and contents, and then closes the file
 
-	this function takes one parameter, test, which defaults to FALSE. turning setting test to TRUE runs programs in a test mode, which allows for additional  information in each section
+	this function takes one parameter, test, which defaults to False. turning setting test to TRUE runs programs in a test mode, which allows for additional  information in each section
 	'''
 
 	rawData = []
@@ -27,12 +27,12 @@ def parse(test):
 	while True:
 		fileName = raw_input("Enter csv file name: ")
 		try: 
-			f = open(str(fileName)+'.csv') #open file
+			f = open(str(fileName)+'.csv','rU') #open file
 			break
 		except IOError:
 			print "No such file or directory " + fileName + ".csv, please try again."
 
-	csv_f = csv.reader(f)
+	csv_f = csv.reader(f,dialect='excel')
 	for row in csv_f:
 		rawData.append(row) #appends each row to rawData array
 	titles = rawData.pop(0)	#removes first row as titles
@@ -49,7 +49,7 @@ def parse(test):
 def x2_gof(test=False):
 	'''
 	chi-square test for goodness of fit: to see if a sample of data matches a population with a specific distribution
-	test is an optional parameter that defaults to FALSE. when test is turned on, additional information is printed
+	test is an optional parameter that defaults to False. when test is turned on, additional information is printed
 	'''
 
 	reset() #makes sure all variables are reset before beginning
@@ -82,44 +82,53 @@ def x2_gof(test=False):
 	if test==True:
 		print "[Section 4]"
 
-	try: #test for integer
-		testcase2 = int(float(exp_input))
-		if testcase2 < len(rawData)+1:
-			exp_index = testcase2-1
-			if test==True:
-				print 'integer exp_index: ',exp_index
-
-			getgofdata(obs_index, exp_index, rawData, test)
-		
-	except ValueError: #not integer
-		try:
-			exp_index = titles.index(exp_input) #tries finding index
-			
-			if test==True:
-				print "matched exp_index: ", exp_index
-
-			getgofdata(obs_index, exp_index, rawData, test)
-
-		except ValueError:
-			#doesn't find index, so assume expected is uniformly distributed
-			print "Could not find in list, assuming data is uniformly distributed"
-
-			for i in range(len(rawData)):
+	if exp_input=="":
+		print "Evenly distributed data"
+		for i in range(len(rawData)):
 				#converts string to float based on column selected
-				obs_values.append(float(rawData[i][obs_index]))
+			obs_values.append(float(rawData[i][obs_index]))
 			
-			goodness(obs_values)
+		goodness(obs_values)
+
+	else:
+	
+		try: #test for integer
+			testcase2 = int(float(exp_input))
+			if testcase2 < len(rawData)+1:
+				exp_index = testcase2-1
+				if test==True:
+					print 'integer exp_index: ',exp_index
+
+				getgofdata(obs_index, exp_index, rawData, test)
+
+			else:
+				print "index out of range"
+			
+		except ValueError: #not integer
+			try:
+				exp_index = titles.index(exp_input) #tries finding index
+				
+				if test==True:
+					print "matched exp_index: ", exp_index
+
+				getgofdata(obs_index, exp_index, rawData, test)
+
+			except ValueError:
+				#doesn't find index, so assume expected is uniformly distributed
+				print "Could not find index in list"
+
+
 
 def x2_ind(test=False):
 	'''
 	chi-square test for independence: used to determine if there is a significant association between two variables
-	test is an optional parameter that defaults to FALSE. when test is turned on, additional information is printed
+	test is an optional parameter that defaults to False. when test is turned on, additional information is printed
 	'''
 
 	reset()
 	titles, rawData = parse(test)
 
-	print 'rawData: ',rawData
+	#print 'rawData: ',rawData
 
 	sel_input = raw_input("Please select columns by name or number to conduct independence test. If selecting multiple columns, use commas or semicolons (ex. 1:3,6): ")
 
@@ -127,17 +136,22 @@ def x2_ind(test=False):
 
 	flipped = zip(*rawData) #transpose rows and columns of rawData, since loops horizontally
 
-	for i in list_index:
-		try:
-			obs_values.append(map(int,flipped[i]))
-		except IndexError:
-			print "could not find index in table"
+	if list_index < len(rawData):
 
-	if test==True:
-		print "[Section 3]"
-		print "Data input values: ",obs_values
-			
-	independence(obs_values, test)
+		for i in list_index:
+			try:
+				obs_values.append(map(int,flipped[i]))
+			except IndexError:
+				print "could not find index in table"
+
+		if test==True:
+			print "[Section 3]"
+			print "Data input values: ",obs_values
+				
+		independence(obs_values, test)
+
+	else:
+		print "List index out of range"
 
 def parseinput(sel_input, titles,test):
 	#parses selected input to create list_index
@@ -169,7 +183,9 @@ def parseinput(sel_input, titles,test):
 					sel_index = titles.index(sel_input[i]) #tries finding index
 					list_index.append(sel_index)
 				except IndexError:
-					print "cannot find index in titles"
+					print "cannot find index in headers"
+				except ValueError:
+					print "cannot find column name in header"
 
 	if test==True:
 		print "list_index to use for independence test: ", list_index
@@ -179,15 +195,19 @@ def parseinput(sel_input, titles,test):
 def getgofdata(obs_index, exp_index, rawData, test):
 	#prints observed and expected values for goodness of fit test using indeces
 
-	for i in range(len(rawData)):
-		obs_values.append(float(rawData[i][obs_index]))
-		exp_values.append(float(rawData[i][exp_index]))
-	
-	if test==True:		
-		print "obs_values: ", obs_values
-		print "exp_values: ", exp_values
-	
-	goodness(obs_values, exp_values)
+	try: 
+		for i in range(len(rawData)):
+			obs_values.append(float(rawData[i][obs_index]))
+			exp_values.append(float(rawData[i][exp_index]))
+		
+		if test==True:		
+			print "obs_values: ", obs_values
+			print "exp_values: ", exp_values
+		
+		goodness(obs_values, exp_values)
+
+	except IndexError:
+		print "Unequal lengths of observed and expected frequencies"
 
 def goodness(f_obs, f_exp=None): #conducts actual test and prints result
 	chi2, p = stats.chisquare(f_obs, f_exp=f_exp)
