@@ -11,7 +11,12 @@ exp_values = []
 obs_index = 0
 exp_index = 0
 
-def parse():
+def parse(test):
+	'''
+	this function is a file input handler. it opens .csv files, reads the file column names and contents, and then closes the file
+
+	this function takes one parameter, test, which defaults to FALSE. turning setting test to TRUE runs programs in a test mode, which allows for additional  information in each section
+	'''
 
 	rawData = []
 	titles = []
@@ -32,17 +37,23 @@ def parse():
 		rawData.append(row) #appends each row to rawData array
 	titles = rawData.pop(0)	#removes first row as titles
 	
+	print "[Section 2]"
 	print "Coln # Coln Name"
 	for i in range(len(titles)):
 		print str.center(str(i+1), 8), titles[i]
 
-	f.close()
+	f.close()#close file to clean up
 
 	return titles,rawData
 
 def x2_gof(test=False):
-	reset()
-	titles, rawData = parse()
+	'''
+	chi-square test for goodness of fit: to see if a sample of data matches a population with a specific distribution
+	test is an optional parameter that defaults to FALSE. when test is turned on, additional information is printed
+	'''
+
+	reset() #makes sure all variables are reset before beginning
+	titles, rawData = parse(test)
 
 	while True:
 		obs_input = raw_input("Please select observed category by coln number or name: ")
@@ -52,6 +63,7 @@ def x2_gof(test=False):
 			if testcase==True & testcase < len(rawData)+1:
 				obs_index = testcase-1
 			if test==True:
+				print "[Section 3]"
 				print 'integer obs_index: ',obs_index
 			break
 		
@@ -59,12 +71,16 @@ def x2_gof(test=False):
 			try:
 				obs_index = titles.index(obs_input) #finds index in array of column
 				if test==True:
+					print "[Section 3]"
 					print "matched obs_index: ", obs_index
 				break
 			except ValueError:
 				print "Could not find category in list."
 		
 	exp_input = raw_input("Please select expected category by coln number or name. If none, leave blank: ")
+
+	if test==True:
+		print "[Section 4]"
 
 	try: #test for integer
 		testcase2 = int(float(exp_input))
@@ -95,8 +111,13 @@ def x2_gof(test=False):
 			goodness(obs_values)
 
 def x2_ind(test=False):
+	'''
+	chi-square test for independence: used to determine if there is a significant association between two variables
+	test is an optional parameter that defaults to FALSE. when test is turned on, additional information is printed
+	'''
+
 	reset()
-	titles, rawData = parse()
+	titles, rawData = parse(test)
 
 	print 'rawData: ',rawData
 
@@ -113,6 +134,7 @@ def x2_ind(test=False):
 			print "could not find index in table"
 
 	if test==True:
+		print "[Section 3]"
 		print "Data input values: ",obs_values
 			
 	independence(obs_values, test)
@@ -155,6 +177,7 @@ def parseinput(sel_input, titles,test):
 	return list_index
 
 def getgofdata(obs_index, exp_index, rawData, test):
+	#prints observed and expected values for goodness of fit test using indeces
 
 	for i in range(len(rawData)):
 		obs_values.append(float(rawData[i][obs_index]))
@@ -166,11 +189,11 @@ def getgofdata(obs_index, exp_index, rawData, test):
 	
 	goodness(obs_values, exp_values)
 
-def goodness(f_obs, f_exp=None):
+def goodness(f_obs, f_exp=None): #conducts actual test and prints result
 	chi2, p = stats.chisquare(f_obs, f_exp=f_exp)
 	print "chi-square statistic: %s \np-value: %s" %(chi2, p)
 
-def independence(table, test):
+def independence(table, test): #conducts test for independence and prints result depending on mode
 	chi2, p, df, f_exp = stats.chi2_contingency(table)
 
 	if test==True:
@@ -179,7 +202,7 @@ def independence(table, test):
 		print "chi-square statistic: %s \np-value: %s" %(chi2, p)
 
 def reset():
-	#resets all global var
+	#resets all global variables
 
 	global rawData
 	rawData = []
