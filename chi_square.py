@@ -57,14 +57,16 @@ def x2_gof(test=False):
 
 	while True:
 		obs_input = raw_input("Please select observed category by coln number or name: ")
+
+		obs_index = 0
 		
 		try: #test for integer
 			testcase = int(float(obs_input))
 			if testcase==True & testcase < len(rawData)+1:
 				obs_index = testcase-1
-			if test==True:
-				print "[Section 3]"
-				print 'integer obs_index: ',obs_index
+				if test==True:
+					print "[Section 3]"
+					print 'integer obs_index: ',obs_index
 			break
 		
 		except ValueError: #not integer
@@ -75,7 +77,10 @@ def x2_gof(test=False):
 					print "matched obs_index: ", obs_index
 				break
 			except ValueError:
-				print "Could not find category in list."
+				if obs_index > len(rawData):
+					print "Could not find category in list"
+				else:
+					print "Missing data value."
 		
 	exp_input = raw_input("Please select expected category by coln number or name. If none, leave blank: ")
 
@@ -114,8 +119,10 @@ def x2_gof(test=False):
 				getgofdata(obs_index, exp_index, rawData, test)
 
 			except ValueError:
-				#doesn't find index, so assume expected is uniformly distributed
-				print "Could not find index in list"
+				if exp_index > len(rawData):
+					print "List index out of range"
+				else:
+					print "Missing data value."
 
 
 
@@ -136,22 +143,22 @@ def x2_ind(test=False):
 
 	flipped = zip(*rawData) #transpose rows and columns of rawData, since loops horizontally
 
-	if list_index < len(rawData):
+	#if list_index < len(rawData)+1:
 
-		for i in list_index:
-			try:
-				obs_values.append(map(int,flipped[i]))
-			except IndexError:
-				print "could not find index in table"
+	for i in list_index:
+		try:
+			obs_values.append(map(int,flipped[i]))
+		except IndexError:
+			print "could not find index in table"
 
-		if test==True:
-			print "[Section 3]"
-			print "Data input values: ",obs_values
-				
-		independence(obs_values, test)
+	if test==True:
+		print "[Section 3]"
+		print "Data input values: ",obs_values
+			
+	independence(obs_values, test)
 
-	else:
-		print "List index out of range"
+	#else:
+		#print "List index out of range"
 
 def parseinput(sel_input, titles,test):
 	#parses selected input to create list_index
