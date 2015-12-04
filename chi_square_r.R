@@ -133,17 +133,3 @@ changewd <- function() #changes working directory
 }
 
 #changewd() #calls function to change wd upon loading file
-
-
-
-errorchecking <- function(){
-  for(input in inputs) {
-   tryCatch(print(paste("log of", input, "=", log(input))),
-      warning = function(w) {
-        print(paste("negative argument", input)); 
-        log(-input)},
-      error = function(e) {print(paste("non-numeric argument", input));
-      NaN})
-  }
-  
-}
