@@ -23,8 +23,8 @@ x2_gof <- function(test=FALSE) #chi-square goodness of fit to see if a sample of
       print("[Section 4]")
       print("Evenly distributed data")
     }
-    rXsq <- chisq.test(rawData[f_obs])
-    print(rXsq)
+    
+    print(chisq.test(rawData[f_obs]))
     
   } else {
     
@@ -33,19 +33,18 @@ x2_gof <- function(test=FALSE) #chi-square goodness of fit to see if a sample of
       f_exp <- as.integer(f_exp)
     }
     
-    sum_exp <- unlist(sum(rawData[f_exp]))
-    norm_exp <- unlist(rawData[f_exp]/sum_exp)
+    norm_exp <- unlist(rawData[f_exp])
    
     if (test==TRUE){
       print("[Section 4]")
       print(paste("expected frequency name: ", f_exp))
-      print("expected frequency normalized: ")
+      print("expected frequencies: ")
       print(norm_exp)
     }
     
-    #runs test
-    rXsq <- chisq.test(rawData[f_obs], p=norm_exp)
-    print(rXsq)
+    tryCatch(print(chisq.test(rawData[f_obs], p=norm_exp)),
+             error = function(e) {print(paste("Error: expected frequency percents do not add to 1"));
+            })
     
   }
   
@@ -133,4 +132,18 @@ changewd <- function() #changes working directory
   
 }
 
-changewd() #calls function to change wd upon loading file
+#changewd() #calls function to change wd upon loading file
+
+
+
+errorchecking <- function(){
+  for(input in inputs) {
+   tryCatch(print(paste("log of", input, "=", log(input))),
+      warning = function(w) {
+        print(paste("negative argument", input)); 
+        log(-input)},
+      error = function(e) {print(paste("non-numeric argument", input));
+      NaN})
+  }
+  
+}

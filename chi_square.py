@@ -217,6 +217,16 @@ def getgofdata(obs_index, exp_index, rawData, test):
 		print "Unequal lengths of observed and expected frequencies"
 
 def goodness(f_obs, f_exp=None): #conducts actual test and prints result
+
+	if f_exp != None: #converts expected frequency percentages to counts
+
+		if sum(f_exp) != 1:
+			print "Error: expected frequency percentages do not add up to 1. Results will not be accurate."
+		
+		else:
+			for i in range(len(f_exp)):
+				f_exp[i] = f_exp[i]*sum(f_obs)
+
 	chi2, p = stats.chisquare(f_obs, f_exp=f_exp)
 	print "chi-square statistic: %s \np-value: %s" %(chi2, p)
 
